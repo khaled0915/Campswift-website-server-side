@@ -32,14 +32,33 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    // camp collection
 
     const campCollection =  client.db('medicalCampDb').collection('camp');
+
+
+    // review collection 
+
+    const reviewsCollection = client.db('medicalCampDb').collection("feedbacks");
 
     // get the popular camp 
 
     app.get('/camp' , async(req , res)=>{
         const result = await campCollection.find().toArray();
 
+        res.send(result);
+    })
+
+    app.get('/camp/camp-details/:id' , async(req, res)=>{
+        const result = await campCollection.findOne();
+        res.send(result);
+    })
+
+
+    // get all the feedbacks
+
+    app.get('/feedbacks' , async(req,res)=>{
+        const result = await reviewsCollection.find().toArray();
         res.send(result);
     })
 
