@@ -98,6 +98,27 @@ async function run() {
     }
 
 
+    // verify organizer
+
+    const verifyOrganizer = async(req,res , next)=>{
+      const email  = req.decoded.email ;
+
+      const query = { email : email  };
+
+      const user = await userCollection.findOne(query);
+
+      const isOrganizer = user?.role === 'organizer';
+
+      if(!isOrganizer){
+
+        return res.status(403).send({ message : 'forbidden access' })
+
+      }
+
+      next();
+    }
+
+
 
 
 
@@ -131,7 +152,7 @@ async function run() {
     // user related api 
 
 
-    app.get('/users' , verifyToken , async(req,res)=>{
+    app.get('/users' , verifyToken , verifyOrganizer ,  async(req,res)=>{
       console.log(req.headers);
       const result = await userCollection.find().toArray();
 
@@ -156,7 +177,7 @@ async function run() {
     })
 
 
-    app.delete( '/users/:id' , async(req ,res) =>{
+    app.delete( '/users/:id'  , verifyToken , verifyOrganizer , async(req ,res) =>{
       const id = req.params.id ;
 
       const query = { _id  : new ObjectId(id)} ;
@@ -167,7 +188,7 @@ async function run() {
     } )
 
 
-    app.patch( '/users/admin/:id' , async(req, res)=>{
+    app.patch( '/users/organizer/:id' , verifyToken , verifyOrganizer , async(req, res)=>{
 
       const id = req.params.id ;
       const filter = { _id : new ObjectId(id) };
