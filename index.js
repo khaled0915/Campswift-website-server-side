@@ -1,6 +1,8 @@
 const express = require('express') ;
 const app = express();
 
+const jwt = require('jsonwebtoken');
+
 const cors = require('cors');
 
 require('dotenv').config()
@@ -48,6 +50,18 @@ async function run() {
     // reg collection 
 
     const regCollection = client.db('medicalCampDb').collection('reg')
+
+
+
+
+    // jwt related 
+
+
+    
+
+
+
+
 
 
 
