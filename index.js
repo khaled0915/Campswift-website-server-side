@@ -186,6 +186,34 @@ async function run() {
     } )
 
 
+    // organizer check 
+
+    app.get('/users/organizer/:email' , verifyToken ,async(req , res)=>{
+
+      const email = req.params.email ;
+
+      if(email !== req.decoded.email ){
+        return res.status(403).send({message : 'forbidden access'});
+
+
+      }
+
+      const query = { email : email } ;
+
+      const user = await userCollection.findOne(query);
+
+      let organizer = false ;
+
+      if(user){
+        organizer = user?.role === 'organizer'
+      }
+
+
+      res.send({organizer});
+
+
+    })
+
 
 
 
