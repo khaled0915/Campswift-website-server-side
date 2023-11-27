@@ -68,6 +68,19 @@ async function run() {
     })
 
 
+    // middleware 
+
+    const verifyToken  = (req, res ,next) =>{
+
+      console.log('inside VT' , req.headers.authorization);
+
+      if(!req.headers.authorization){
+        return res.status( 401 ).send({message : 'unauthorized access'})
+      }
+
+    }
+
+
 
 
 
@@ -101,7 +114,8 @@ async function run() {
     // user related api 
 
 
-    app.get('/users' , async(req,res)=>{
+    app.get('/users' , verifyToken , async(req,res)=>{
+      console.log(req.headers);
       const result = await userCollection.find().toArray();
 
       res.send(result);
