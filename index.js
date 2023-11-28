@@ -51,6 +51,10 @@ async function run() {
 
     const regCollection = client.db('medicalCampDb').collection('reg')
 
+    // participant info collection 
+
+    const participantCollection = client.db('medicalCampDb').collection('participantInfo')
+
 
 
 
@@ -159,6 +163,26 @@ async function run() {
     })
 
 
+    app.get('/participant' , async(req,res)=>{
+      const result = await participantCollection.find().toArray();
+
+      res.send(result);
+    } )
+
+    app.post( '/participant' , async(req,res)=>{
+
+      const user = req.body ;
+
+      const query = { email : user.email }
+
+      const result  = await participantCollection.insertOne(user);
+
+      res.send(result);
+
+
+    } )
+
+
     // user related api 
 
 
@@ -248,7 +272,7 @@ async function run() {
 
     // delete camp as organizer
 
-    app.delete( '/camp/:id' , verifyToken , verifyOrganizer,  async(req,res ) =>{
+    app.delete( '/delete-camp/:id' , verifyToken , verifyOrganizer,  async(req,res ) =>{
       const id = req.params.id ;
 
       const query = { _id : new ObjectId(id) };
