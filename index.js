@@ -164,7 +164,11 @@ async function run() {
 
 
     app.get('/participant' , async(req,res)=>{
-      const result = await participantCollection.find().toArray();
+
+      const email = req.query.email ;
+
+      const query = {email   :email} ;
+      const result = await participantCollection.find(query).toArray();
 
       res.send(result);
     } )
@@ -173,7 +177,7 @@ async function run() {
 
       const user = req.body ;
 
-      const query = { email : user.email }
+      // const query = { email : user.email }
 
       const result  = await participantCollection.insertOne(user);
 
