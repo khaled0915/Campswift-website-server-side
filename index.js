@@ -135,6 +135,16 @@ async function run() {
         res.send(result);
     })
 
+    app.post('/camp' , verifyToken , verifyOrganizer,  async(req,  res)=>{
+
+      const item = req.body ;
+
+      const result = await campCollection.insertOne(item);
+
+      res.send(result);
+
+    })
+
     app.get('/camp/camp-details/:id' , async(req, res)=>{
         const result = await campCollection.findOne();
         res.send(result);
@@ -234,6 +244,19 @@ async function run() {
 
 
     })
+
+
+    // delete camp as organizer
+
+    app.delete( '/camp/:id' , verifyToken , verifyOrganizer,  async(req,res ) =>{
+      const id = req.params.id ;
+
+      const query = { _id : new ObjectId(id) };
+
+      const result = await campCollection.deleteOne(query);
+
+      res.send(result)
+    }  )
 
 
 
