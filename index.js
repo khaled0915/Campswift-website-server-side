@@ -3,6 +3,8 @@ const app = express();
 
 const jwt = require('jsonwebtoken');
 
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
+
 const cors = require('cors');
 
 require('dotenv').config()
@@ -39,6 +41,9 @@ async function run() {
     const campCollection =  client.db('medicalCampDb').collection('camp');
 
 
+    const campsCollection =  client.db('medicalCampDb').collection('camps');
+
+
     // review collection 
 
     const reviewsCollection = client.db('medicalCampDb').collection("feedbacks");
@@ -55,6 +60,11 @@ async function run() {
 
     const participantCollection = client.db('medicalCampDb').collection('participantInfo')
 
+
+    // payment collection
+
+
+    const paymentCollection = client.db('medicalCampDb').collection('payments')
 
 
 
@@ -133,24 +143,24 @@ async function run() {
 
     // get the popular camp 
 
-    app.get('/camp' , async(req , res)=>{
-        const result = await campCollection.find().toArray();
+    app.get('/camps' , async(req , res)=>{
+        const result = await campsCollection.find().toArray();
 
         res.send(result);
     })
 
-    app.post('/camp' , verifyToken , verifyOrganizer,  async(req,  res)=>{
+    app.post('/camps' , verifyToken , verifyOrganizer,  async(req,  res)=>{
 
       const item = req.body ;
 
-      const result = await campCollection.insertOne(item);
+      const result = await campsCollection.insertOne(item);
 
       res.send(result);
 
     })
 
-    app.get('/camp/camp-details/:id' , async(req, res)=>{
-        const result = await campCollection.findOne();
+    app.get('/camps/camp-details/:id' , async(req, res)=>{
+        const result = await campsCollection.findOne();
         res.send(result);
     })
 
@@ -274,6 +284,18 @@ async function run() {
     })
 
 
+    app.get('/camps/:id' , async(req,res)=>{
+      const id = req.params.id ;
+
+      const query = { _id : new ObjectId(id)} ;
+
+      const result = await campsCollection.findOne(query) ;
+
+      res.send(result);
+      
+    })
+
+
     // delete camp as organizer
 
     app.delete( '/delete-camp/:id' , verifyToken , verifyOrganizer,  async(req,res ) =>{
@@ -281,10 +303,43 @@ async function run() {
 
       const query = { _id : new ObjectId(id) };
 
-      const result = await campCollection.deleteOne(query);
+      const result = await campsCollection.deleteOne(query);
 
       res.send(result)
     }  )
+
+
+    // payment gateway
+
+    app.post('/create-payment-intent'  , async(req,res)=>{
+
+      const {price} = req.body ;
+
+      const amount = parseInt(price *100);
+console.log('amount inside the intent' , amount);
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount : amount ,
+        currency : 'usd' ,
+        payment_method_types : ['card']
+      })
+
+      res.send({
+        clientSecret : paymentIntent.client_secret
+      })
+    })
+
+
+app.post('/payments' , async(req,res)=>{
+  const payment  = req.body;
+
+  const paymentResult = await paymentCollection.insertOne(payment);
+
+  res.send(paymentResult);
+
+
+
+})
+
 
 
 
