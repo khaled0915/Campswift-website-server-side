@@ -14,6 +14,12 @@ const port = process.env.PORT || 5000 ;
 
 // middleware 
 
+// app.use(
+//   cors({
+//       origin: ['http://localhost:5174' , 'https://courageous-liger-a4d6df.netlify.app' , 'https://medical-camp-management-server.vercel.app'],
+//       credentials: true,
+//   }),
+// )
 app.use(cors());
 app.use(express.json());
 
@@ -172,6 +178,9 @@ async function run() {
         res.send(result);
     })
 
+   
+
+
 
     app.get('/participant' , async(req,res)=>{
 
@@ -182,6 +191,9 @@ async function run() {
 
       res.send(result);
     } )
+
+
+    
 
     app.post( '/participant' , async(req,res)=>{
 
@@ -195,6 +207,17 @@ async function run() {
 
 
     } )
+
+
+    
+   app.get('/all'  , async(req,res)=>{
+
+
+    const result = await participantCollection.find().toArray();
+    res.send(result);
+   })
+
+
 
 
     // user related api 
